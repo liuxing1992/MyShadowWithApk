@@ -1,0 +1,84 @@
+
+buildscript {//这个模块要放在plugins {} 之前
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.tencent.shadow.core:runtime'
+        classpath 'com.tencent.shadow.core:activity-container'
+        classpath 'com.tencent.shadow.core:gradle-plugin'
+        classpath 'org.javassist:javassist:3.22.0-GA'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'com.tencent.shadow.plugin'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+android {
+    namespace 'com.fan.test_shadow_case'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId project.APP_APPLICATION_ID
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            signingConfig signingConfigs.create("release")
+            signingConfig.initWith(buildTypes.debug.signingConfig)
+        }
+    }
+
+    // 将插件applicationId设置为和宿主相同
+    productFlavors {
+        plugin {
+            applicationId project.APP_APPLICATION_ID
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    aaptOptions {
+        additionalParameters "--package-id", "0x7E", "--allow-reserved-package-id"
+    }
+
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    compileOnly 'com.tencent.shadow.core:runtime'
+}
+
+shadow {
+    transform {
+//        useHostContext = ['abc']
+    }
+}
+
+
